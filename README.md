@@ -274,14 +274,3 @@ All **11 tests pass**, verifying:
 - **[Data Contract](metadata/data_contract.yml):** Schema specifications, nullability rules, valid ranges, and failure handling policies.
 - **[Source Profile](metadata/source_profile.md):** Detailed exploratory analysis of feature distributions and target balance.
 
----
-
-## 10. Git Commit & Push Instructions
-
-To push the entire validated pipeline to your GitHub repository:
-
-```bash
-git add .
-git commit -m "feat: complete DSS150P Lab 4 reproducible pipeline with data engineering lifecycle, contracts, tests, and documentation"
-git push origin main
-```
