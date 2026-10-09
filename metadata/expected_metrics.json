@@ -1,45 +1,124 @@
 {
-  "baseline_description": "Authoritative reproducible baseline metrics for DSS150P Lab 4",
-  "author": "David Hyzxent L. Memorando",
-  "student_number": "2024162312",
-  "section": "DSS150P_CM17_1Q2627",
-  "dataset": "ai_human_content_detection_dataset.csv (SHA-256: b63cbf71bf8921071fb4513a0d0616494040463e1d41c7c04ac46ccbb530be1f)",
-  "random_seed": 42,
-  "test_size": 0.2,
-  "stratified": true,
-  "tolerance_f1_weighted": 0.02,
-  "best_classifier": "LogisticRegression",
-  "best_f1_weighted": 0.5584,
+  "citation": {
+    "title": "A Comparative Analysis of Machine Learning Classifiers for Distinguishing Human-Written and AI-Generated Text Using Stylometric and Lexical Features",
+    "authors": [
+      "David Hyzxent L. Memorando",
+      "Juan Miguel D. Dela Llarte"
+    ],
+    "institution": "School of Information and Technology, Mapua University, Makati, Philippines",
+    "emails": [
+      "dhlmemorando@mymail.mapua.edu.ph",
+      "jmddelallarte@mymail.mapua.edu.ph"
+    ],
+    "system_name": "Rosetta"
+  },
+  "original_study_setup": {
+    "dataset_name": "rosetta_dataset_tabular.xlsx / ai_human_content_detection_dataset.csv",
+    "raw_entries": 1611,
+    "cleaned_entries": 1499,
+    "cleaning_method": "dropna on 9 selected stylometric features (edit_level excluded due to 84.9% missingness)",
+    "class_distribution": {
+      "AI (Class 1)": "833 instances (55.6%)",
+      "Human (Class 0)": "666 instances (44.4%)"
+    },
+    "split_ratio": "80% train / 20% test",
+    "train_samples": 1199,
+    "test_samples": 300,
+    "test_distribution": {
+      "AI (Class 1)": 167,
+      "Human (Class 0)": 133
+    },
+    "random_state": 42,
+    "stratified": true,
+    "scaling": "StandardScaler fit exclusively on X_train, applied to X_test",
+    "features_used": [
+      "word_count",
+      "character_count",
+      "sentence_count",
+      "lexical_diversity",
+      "avg_sentence_length",
+      "avg_word_length",
+      "punctuation_ratio",
+      "flesch_reading_ease",
+      "gunning_fog_index"
+    ]
+  },
+  "tolerance": {
+    "metric": "f1_weighted",
+    "threshold": 0.05,
+    "note": "Documented tolerance for cross-environment reproducibility accounting for snapshot row differences (1,367 vs 1,499 rows)"
+  },
   "classifiers": {
     "LogisticRegression": {
-      "accuracy": 0.5584,
-      "f1_weighted": 0.5584,
-      "f1_macro": 0.5584,
-      "roc_auc": 0.5521
-    },
-    "SVC": {
-      "accuracy": 0.5547,
-      "f1_weighted": 0.5547,
-      "f1_macro": 0.5547,
-      "roc_auc": 0.4383
-    },
-    "RandomForest": {
-      "accuracy": 0.4818,
-      "f1_weighted": 0.4800,
-      "f1_macro": 0.4800,
-      "roc_auc": 0.4982
-    },
-    "GradientBoosting": {
-      "accuracy": 0.4745,
-      "f1_weighted": 0.4731,
-      "f1_macro": 0.4731,
-      "roc_auc": 0.4809
+      "model_family": "Regularized Generalized Linear Model",
+      "hyperparameters": {
+        "max_iter": 1000,
+        "random_state": 42,
+        "solver": "lbfgs"
+      },
+      "reported_metrics": {
+        "accuracy": 0.5767,
+        "precision_ai": 0.6250,
+        "recall_ai": 0.5988,
+        "f1_ai": 0.6116,
+        "f1_macro": 0.5700,
+        "f1_weighted": 0.5800,
+        "roc_auc": "unknown"
+      },
+      "confusion_matrix": {
+        "true_positive_ai": 100,
+        "true_negative_human": 73,
+        "false_positive": 60,
+        "false_negative": 67
+      }
     },
     "DecisionTree": {
-      "accuracy": 0.4818,
-      "f1_weighted": 0.4653,
-      "f1_macro": 0.4653,
-      "roc_auc": 0.5100
+      "model_family": "Non-parametric Recursive Partitioning",
+      "hyperparameters": {
+        "max_depth": 10,
+        "min_samples_split": 10,
+        "criterion": "gini",
+        "random_state": 42
+      },
+      "reported_metrics": {
+        "accuracy": 0.5267,
+        "precision_ai": 0.5523,
+        "recall_ai": 0.7904,
+        "f1_ai": 0.6502,
+        "f1_macro": 0.4600,
+        "f1_weighted": 0.4800,
+        "roc_auc": 0.5900
+      },
+      "feature_importance_top": {
+        "lexical_diversity": 0.5503,
+        "avg_sentence_length": 0.1585,
+        "character_count": 0.0874,
+        "sentence_count": 0.0000
+      }
+    },
+    "XGBoost": {
+      "model_family": "Gradient Boosted Decision Trees",
+      "hyperparameters": {
+        "n_estimators": 100,
+        "learning_rate": 0.01,
+        "max_depth": 3,
+        "subsample": 0.7,
+        "colsample_bytree": 0.7,
+        "random_state": 42
+      },
+      "reported_metrics": {
+        "accuracy": 0.5933,
+        "precision_ai": 0.6552,
+        "recall_ai": 0.5689,
+        "f1_ai": 0.6090,
+        "f1_macro": 0.5900,
+        "f1_weighted": 0.5900,
+        "roc_auc": "unknown"
+      },
+      "threshold_calibration": {
+        "method": "internal 80/20 train-validation split (random_state=42)",
+        "balanced_threshold": 0.5245
+      }
     }
   }
 }

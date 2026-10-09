@@ -1,6 +1,7 @@
 classifier,accuracy,f1_weighted,f1_macro,roc_auc
 LogisticRegression,0.5584,0.5584,0.5584,0.5521
 SVC,0.5547,0.5547,0.5547,0.4383
+DecisionTree,0.5511,0.5497,0.5497,0.5434
+XGBoost,0.5146,0.5145,0.5145,0.4846
 RandomForest,0.4818,0.48,0.48,0.4982
-GradientBoosting,0.4745,0.4731,0.4731,0.4809
-DecisionTree,0.4818,0.4653,0.4653,0.51
+GradientBoosting,0.4781,0.4769,0.4769,0.5233

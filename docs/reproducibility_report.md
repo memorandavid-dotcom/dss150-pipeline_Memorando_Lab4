@@ -5,73 +5,75 @@
 **Section:** DSS150P_CM17_1Q2627  
 **Course:** DSS150P — Fundamentals of Data Engineering  
 **Activity:** Integrated Individual Laboratory Activity #4  
-**Project Title:** *A Comparative Analysis of Machine Learning Classifiers for Distinguishing Human-Written and AI-Generated Text Using Stylometric and Lexical Features*  
 **Date:** October 2026  
 
 ---
 
-## 1. Reproducibility Contract & Execution Guarantee
+## 1. Prior Study Citation & Ground Truth Baseline
 
-The pipeline was engineered to strictly satisfy the **DSS150P Reproducibility Contract**:
-1. **Zero Hardcoded Paths:** Every directory and filepath is resolved relative to `PROJECT_ROOT` in `src/config.py`.
-2. **Deterministic Preprocessing:** Standard scaling is fit exclusively on the training split, and categorical variables are mapped deterministically.
-3. **Deterministic Splitting:** Seed `42` with stratification across target `label` is locked in `metadata/split_manifest.json`.
-4. **Frozen Random Seeds:** All 5 classifiers enforce `random_state=42` during both cross-validation and final model fitting.
-5. **Rerun Idempotency:** Subsequent executions do not duplicate rows in staging or curated datasets due to row-level MD5 hashing (`_row_hash`) and checkpoint watermarks (`data/raw/.checkpoint.json`).
+This data product reproduces the predictive analytics research originally conducted and reported in:
 
----
+> **Memorando, D. H. L., & Dela Llarte, J. M. D. (2025).** *A Comparative Analysis of Machine Learning Classifiers for Distinguishing Human-Written and AI-Generated Text Using Stylometric and Lexical Features.* School of Information and Technology, Mapúa University, Makati, Philippines.
 
-## 2. Baseline Reproduction vs. Actual Run Evidence
-
-The pipeline was executed against the primary dataset (`ai_human_content_detection_dataset.csv`, SHA-256: `b63cbf71bf8921071fb4513a0d0616494040463e1d41c7c04ac46ccbb530be1f`).
-
-Below is the comparison between the baseline expectations recorded in `metadata/expected_metrics.json` and the empirical results computed in `outputs/metrics.json` under an automated tolerance threshold of **$\pm 0.02$ ($\pm 2.0\%$)**:
-
-| Classifier | Baseline F1 (Weighted) | Actual Run F1 (Weighted) | Absolute Difference ($\Delta$) | Tolerance Limit | Verification Status | Accuracy | ROC-AUC |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Logistic Regression** | **0.5584** | **0.5584** | **0.0000** | $\pm 0.0200$ | **PASS** | 0.5584 | 0.5521 |
-| **Support Vector Classifier (SVC)** | **0.5547** | **0.5547** | **0.0000** | $\pm 0.0200$ | **PASS** | 0.5547 | 0.4383 |
-| **Random Forest** | **0.4800** | **0.4800** | **0.0000** | $\pm 0.0200$ | **PASS** | 0.4818 | 0.4982 |
-| **Gradient Boosting** | **0.4731** | **0.4731** | **0.0000** | $\pm 0.0200$ | **PASS** | 0.4745 | 0.4809 |
-| **Decision Tree** | **0.4653** | **0.4653** | **0.0000** | $\pm 0.0200$ | **PASS** | 0.4818 | 0.5100 |
-
-*Result:* **100% of classifiers passed the reproducibility gate**, reproducing metrics with near zero delta ($\Delta < 0.0001$).
+### Original Experimental Setup:
+- **Project Pipeline:** *Rosetta* — an interpretable supervised classification framework.
+- **Source Dataset:** `rosetta_dataset_tabular.xlsx` (1,611 raw observations, reduced to **1,499 complete rows** via `dropna` across the 9 primary stylometric features; `edit_level` excluded due to 84.9% missingness).
+- **Class Distribution:** AI-Generated (Class 1) = 833 (55.6%), Human-Written (Class 0) = 666 (44.4%).
+- **Data Split:** 80/20 train/test split using `scikit-learn` `train_test_split(..., test_size=0.20, random_state=42, stratify=y)`.
+- **Sample Sizes:** Training = 1,199 samples; Held-out Test Set = **300 samples** (167 AI, 133 Human).
+- **Feature Scaling:** `StandardScaler` fit exclusively on `X_train` and applied to `X_test`.
+- **Primary Feature Set (Tabular Baseline):** 9 stylometric indicators (`word_count`, `character_count`, `sentence_count`, `lexical_diversity`, `avg_sentence_length`, `avg_word_length`, `punctuation_ratio`, `flesch_reading_ease`, `gunning_fog_index`).
 
 ---
 
-## 3. Rerun Safety & Idempotency Audit
+## 2. Real Baseline vs. Current Pipeline Execution Evidence
 
-To prove rerun safety, the ingestion and transformation processes were re-executed sequentially:
+Below is the honest comparative analysis between the **actual reported numbers from the original paper** (stored in `metadata/expected_metrics.json`) and the empirical evaluation produced by this pipeline run (stored in `outputs/metrics.json` and checked via `outputs/reproducibility_check.json` under tolerance threshold $\pm 0.05$):
 
-1. **Initial Full Ingestion:**
-   - 1,367 rows ingested into `data/raw/full__*.parquet`.
-   - Audit columns generated: `_pipeline_run_id`, `_ingested_at_utc`, `_source_file`, `_source_checksum`, `_row_hash`.
-2. **Incremental Batch Ingestion:**
-   - Source split into 3 deterministic chunks (455, 455, 457 rows).
-   - Checkpoint `.checkpoint.json` recorded batch IDs `batch_01_of_03`, `batch_02_of_03`, and `batch_03_of_03`.
-3. **Repeated Incremental Ingestion without `--force`:**
-   - Output log: `No new batches to ingest. All 3 batches already committed.`
-   - Verification: Zero duplicate chunks were appended.
-4. **Staging Transformation Deduplication:**
-   - Deduplication assertion verified `0 duplicate rows found (keyed by _row_hash)`.
-   - Staging table row count remained stable at exactly **1,367 rows**.
+| Classifier | Baseline Metric (Paper) | Actual Run Metric (Pipeline) | Absolute Delta ($\Delta$) | Tolerance Limit | Verification Status | Notes |
+| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| **Logistic Regression** | **Weighted F1: 0.5800**<br>(Accuracy: 0.5767) | **Weighted F1: 0.5584**<br>(Accuracy: 0.5584) | **0.0216** | $\pm 0.0500$ | **PASS** | Within tolerance; exhibits high bias consistent with paper. |
+| **Decision Tree** | **Weighted F1: 0.4800**<br>(Accuracy: 0.5267) | **Weighted F1: 0.5497**<br>(Accuracy: 0.5511) | **0.0697** | $\pm 0.0500$ | **FAIL (Misses Tolerance)** | Overfitting characteristics vary due to feature space differences. |
+| **XGBoost / Gradient Boost** | **Weighted F1: 0.5900**<br>(Accuracy: 0.5933) | **Weighted F1: 0.5145**<br>(Accuracy: 0.5146) | **0.0755** | $\pm 0.0500$ | **FAIL (Misses Tolerance)** | Default threshold 0.50 vs paper's balanced threshold ($\tau=0.5245$). |
+| **Random Forest** | *Not evaluated in prior study* | Weighted F1: 0.4800<br>(Accuracy: 0.4818) | N/A | N/A | **INFO** | Added during exploratory benchmarking. |
+| **SVC** | *Not evaluated in prior study* | Weighted F1: 0.5547<br>(Accuracy: 0.5547) | N/A | N/A | **INFO** | Added during exploratory benchmarking. |
 
 ---
 
-## 4. Engineering Improvements Over Historical Group Project
+## 3. Engineering Diagnosis: Why Do The Metrics Differ?
 
-| Phase | Previous Group Project State | Production Data Engineering Treatment (DSS150P) |
-| :--- | :--- | :--- |
-| **Source Provenance** | Ad-hoc CSV download on local machine | Cryptographic SHA-256 fingerprint verified in automated CLI check |
-| **Execution State** | Jupyter Notebook executed cell-by-cell | Modular Python package (`src/`) with CLI and Airflow DAG |
-| **Data Cleaning** | Interactive Pandas cells with hidden state | Idempotent staging transformation with median imputation and quarantine |
-| **Splitting Logic** | Uncontrolled random seed | Fixed seed `42` with stratified indices persisted in `split_manifest.json` |
-| **Storage Architecture**| Single flat CSV file | Tiered Parquet storage, Hive-style partitioning, and PostgreSQL relational views |
-| **Validation** | Informal manual inspection of head() rows | 29 automated data quality assertions in `outputs/quality_report.json` |
-| **Verification Gate** | Subjective accuracy reporting | Machine-readable comparison against `expected_metrics.json` |
+In accordance with the core laboratory goal of **transparent and honest reproducibility**, we identify five concrete engineering factors that account for the metric differences:
+
+1. **Source Dataset Snapshot Discrepancy (1,367 vs. 1,499 rows):**
+   - The authoritative CSV provided in this repository (`ai_human_content_detection_dataset.csv`) contains **1,367 rows**, whereas the original paper analyzed a **1,499-row** dataset derived from an earlier 1,611-row Excel workbook.
+   - Because the source row population differs by 132 records, the resulting 80/20 test set contains **274 samples** in this pipeline rather than the **300 samples** evaluated in the publication.
+
+2. **Missing Value Imputation vs. Listwise Deletion (`dropna`):**
+   - In the paper, rows containing missing values in readability metrics were discarded via `dropna()`.
+   - In this production data pipeline, to prevent data loss in streaming/incremental batches, numerical nulls (`flesch_reading_ease`: 79 nulls, `gunning_fog_index`: 35 nulls, etc.) were imputed using the column median. This alters the feature variance and boundary distributions slightly.
+
+3. **Classification Threshold Tuning ($\tau = 0.5245$):**
+   - The paper's strongest XGBoost results relied on a post-hoc probability threshold calibration ($\tau = 0.5245$) selected on an internal validation set to balance class recall.
+   - The automated CLI pipeline evaluates models at the standard decision boundary ($\tau = 0.5000$). At $\tau = 0.50$, the original paper also reported higher class asymmetry (AI recall 0.65 vs Human recall 0.53).
+
+4. **Expanded Feature Space (15 features vs. 9 features):**
+   - The paper's tabular baseline isolated strictly 9 stylometric features.
+   - The current dataset contains additional engineered columns (`grammar_errors`, `passive_voice_ratio`, `predictability_score`, `burstiness`, `sentiment_score`), altering tree splits and regularization penalties.
+
+5. **Runtime Environment & Package Implementation:**
+   - In Python 3.14 on Windows, XGBoost binary wheels fall back gracefully to scikit-learn's `GradientBoostingClassifier` with default boosting parameters, which has minor implementation differences from the native C++ DMatrix boosting engine of `xgboost 2.0.3`.
 
 ---
 
-## 5. Conclusion
+## 4. Rerun Safety & Determinism Verification
 
-The predictive analytics project has been successfully productionized into an enterprise-grade data engineering system. Any engineer can clone the repository, run `make run-all`, and reproduce the exact model metrics and curated outputs with zero manual source code modification.
+Despite dataset snapshot differences, the engineered data pipeline guarantees **deterministic rerun execution**:
+- Re-running the pipeline on the identical source snapshot produces the exact same train/test splits, scaler parameters (`metadata/split_manifest.json`), and model weights.
+- All evaluation metrics are deterministic across repeated runs when fixed to seed `42`.
+- Zero duplicate records are introduced into staging or curated layers on repeated execution.
+
+---
+
+## 5. Summary Conclusion
+
+By replacing self-referential targets with the **true published results of Memorando & Dela Llarte (2025)**, this laboratory provides authentic, audit-ready scientific reproducibility evidence. The pipeline successfully flags where and why results diverge due to dataset versioning and thresholding differences, fulfilling the data engineering lifecycle requirements of DSS150P.

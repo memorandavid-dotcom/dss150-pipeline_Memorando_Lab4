@@ -254,42 +254,49 @@ def check_reproducibility(
     with open(baseline_path, "r", encoding="utf-8") as fh:
         baseline = json.load(fh)
 
-    tolerance = config.get("reproducibility.tolerance", 0.02)
-    metric_key = config.get("reproducibility.metric", "f1_weighted")
+    tolerance = (
+        baseline.get("tolerance", {}).get("threshold")
+        or config.get("reproducibility.tolerance", 0.05)
+    )
+    metric_key = (
+        baseline.get("tolerance", {}).get("metric")
+        or config.get("reproducibility.metric", "f1_weighted")
+    )
     results: list[CheckResult] = []
 
-    for classifier_name, expected in baseline.get("classifiers", {}).items():
+    for classifier_name, expected_obj in baseline.get("classifiers", {}).items():
         actual = actual_metrics.get(classifier_name, {})
         if not actual:
             results.append(
                 _result(
                     f"reproducibility.{classifier_name}",
                     "WARN",
-                    "No actual metrics found for this classifier.",
+                    f"Classifier '{classifier_name}' evaluated in baseline but not in current run.",
                 )
             )
             continue
 
-        exp_val = expected.get(metric_key)
+        reported = expected_obj.get("reported_metrics", expected_obj)
+        exp_val = reported.get(metric_key)
         act_val = actual.get(metric_key)
-        if exp_val is None or act_val is None:
+        if exp_val is None or exp_val == "unknown" or act_val is None:
             results.append(
                 _result(
                     f"reproducibility.{classifier_name}",
                     "WARN",
-                    f"Missing '{metric_key}' in baseline or actual.",
+                    f"Metric '{metric_key}' missing or marked unknown in baseline/actual.",
                 )
             )
             continue
 
-        diff = abs(act_val - exp_val)
+        diff = abs(float(act_val) - float(exp_val))
         status = "PASS" if diff <= tolerance else "FAIL"
         results.append(
             _result(
                 f"reproducibility.{classifier_name}",
                 status,
-                f"{metric_key}: expected={exp_val:.4f}, actual={act_val:.4f}, diff={diff:.4f} (tol={tolerance})",
-                {"expected": exp_val, "actual": act_val, "diff": diff},
+                f"{metric_key}: expected={float(exp_val):.4f}, actual={float(act_val):.4f}, diff={diff:.4f} (tol={tolerance})",
+                {"expected": float(exp_val), "actual": float(act_val), "diff": diff},
             )
         )
 
