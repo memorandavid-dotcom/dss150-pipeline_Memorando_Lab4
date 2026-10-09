@@ -101,7 +101,7 @@ def evaluate_all(force: bool = False) -> dict[str, Any]:
     """
     config.ensure_dirs()
     X_test, y_test = _load_test()
-    logger.info("Test data: %d rows × %d features", len(X_test), X_test.shape[1])
+    logger.info("Test data: %d rows x %d features", len(X_test), X_test.shape[1])
 
     all_metrics: dict[str, dict] = {}
     best_clf_name: Optional[str] = None
@@ -122,7 +122,7 @@ def evaluate_all(force: bool = False) -> dict[str, Any]:
         all_metrics[name] = {k: v for k, v in metrics.items() if k != "predictions"}
 
         logger.info(
-            "%s → acc=%.4f  f1_weighted=%.4f  roc_auc=%s",
+            "%s -> acc=%.4f  f1_weighted=%.4f  roc_auc=%s",
             name,
             metrics["accuracy"],
             metrics["f1_weighted"],
@@ -147,7 +147,7 @@ def evaluate_all(force: bool = False) -> dict[str, Any]:
     metrics_path = config.Paths.outputs / "metrics.json"
     with open(metrics_path, "w", encoding="utf-8") as fh:
         json.dump(metrics_out, fh, indent=2, default=str)
-    logger.info("Metrics saved → %s", metrics_path.name)
+    logger.info("Metrics saved -> %s", metrics_path.name)
 
     # --- Persist predictions.csv (from best classifier) ---
     if best_clf_name:
@@ -157,7 +157,7 @@ def evaluate_all(force: bool = False) -> dict[str, Any]:
         preds_path = config.Paths.outputs / "predictions.csv"
         test_df.to_csv(preds_path, index=False)
         logger.info(
-            "Predictions (from %s) saved → %s", best_clf_name, preds_path.name
+            "Predictions (from %s) saved -> %s", best_clf_name, preds_path.name
         )
 
     # --- Reproducibility check ---
@@ -165,7 +165,7 @@ def evaluate_all(force: bool = False) -> dict[str, Any]:
     repro_path = config.Paths.outputs / "reproducibility_check.json"
     with open(repro_path, "w", encoding="utf-8") as fh:
         json.dump(repro_results, fh, indent=2, default=str)
-    logger.info("Reproducibility check saved → %s", repro_path.name)
+    logger.info("Reproducibility check saved -> %s", repro_path.name)
 
     # --- Comparison table ---
     comparison_rows = []
@@ -182,7 +182,7 @@ def evaluate_all(force: bool = False) -> dict[str, Any]:
     comp_df = pd.DataFrame(comparison_rows).sort_values("f1_weighted", ascending=False)
     comp_path = config.Paths.outputs / "classifier_comparison.csv"
     comp_df.to_csv(comp_path, index=False)
-    logger.info("Comparison table saved → %s", comp_path.name)
+    logger.info("Comparison table saved -> %s", comp_path.name)
 
     try:
         logger.info("\n%s", comp_df.to_string(index=False))

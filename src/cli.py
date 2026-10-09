@@ -49,7 +49,7 @@ def _setup_logging(verbose: bool = False) -> None:
 @click.option("--verbose", "-v", is_flag=True, default=False, help="Enable debug logging.")
 @click.pass_context
 def cli(ctx: click.Context, verbose: bool) -> None:
-    """DSS150P Lab 4 — AI vs Human Text Detection Pipeline."""
+    """DSS150P Lab 4 - AI vs Human Text Detection Pipeline."""
     _setup_logging(verbose)
     ctx.ensure_object(dict)
     ctx.obj["verbose"] = verbose
@@ -75,13 +75,13 @@ def ingest(mode: str, force: bool) -> None:
 
     if mode == "full":
         path = ingest_full(force=force)
-        click.echo(f"✓ Full ingestion → {path}")
+        click.echo(f"[OK] Full ingestion -> {path}")
     else:
         paths = ingest_incremental(force=force)
         if paths:
-            click.echo(f"✓ Incremental ingestion: {len(paths)} new batch(es)")
+            click.echo(f"[OK] Incremental ingestion: {len(paths)} new batch(es)")
         else:
-            click.echo("⚡ No new batches to ingest (all already committed).")
+            click.echo("[INFO] No new batches to ingest (all already committed).")
 
 
 # --------------------------------------------------------------------------
@@ -92,13 +92,13 @@ def ingest(mode: str, force: bool) -> None:
 @cli.command()
 @click.option("--force", is_flag=True, default=False, help="Force re-transformation.")
 def transform(force: bool) -> None:
-    """Transform raw → staging → curated."""
+    """Transform raw -> staging -> curated."""
     from src.transform import transform_raw_to_staging, transform_staging_to_curated
 
     staging = transform_raw_to_staging(force=force)
-    click.echo(f"✓ Staging → {staging}")
+    click.echo(f"[OK] Staging -> {staging}")
     paths = transform_staging_to_curated(force=force)
-    click.echo(f"✓ Curated → {paths['train']} / {paths['test']}")
+    click.echo(f"[OK] Curated -> {paths['train']} / {paths['test']}")
 
 
 # --------------------------------------------------------------------------
@@ -115,7 +115,7 @@ def validate() -> None:
 
     staging_path = config.Paths.staging / "staging.parquet"
     if not staging_path.exists():
-        click.echo("✗ Staging file not found. Run 'transform' first.")
+        click.echo("[ERROR] Staging file not found. Run 'transform' first.")
         sys.exit(1)
 
     df = pd.read_parquet(staging_path, engine="pyarrow")
@@ -125,7 +125,7 @@ def validate() -> None:
     warn_count = sum(1 for r in results if r["status"] == "WARN")
     pass_count = sum(1 for r in results if r["status"] == "PASS")
 
-    click.echo(f"\n✓ PASS: {pass_count}  ⚠ WARN: {warn_count}  ✗ FAIL: {fail_count}")
+    click.echo(f"\n[OK] PASS: {pass_count}  [WARN] WARN: {warn_count}  [FAIL] FAIL: {fail_count}")
     if fail_count > 0:
         sys.exit(1)
 
@@ -143,17 +143,17 @@ def storage(skip_postgres: bool) -> None:
 
     paths = export_all_formats()
     for fmt, p in paths.items():
-        click.echo(f"✓ {fmt.upper()} → {p}")
+        click.echo(f"[OK] {fmt.upper()} -> {p}")
 
     export_partitioned()
-    click.echo("✓ Partitioned Parquet written.")
+    click.echo("[OK] Partitioned Parquet written.")
 
     if not skip_postgres:
         try:
             load_curated_to_postgres()
-            click.echo("✓ Loaded to PostgreSQL.")
+            click.echo("[OK] Loaded to PostgreSQL.")
         except Exception as exc:
-            click.echo(f"⚠ PostgreSQL load skipped: {exc}")
+            click.echo(f"[WARN] PostgreSQL load skipped: {exc}")
 
 
 # --------------------------------------------------------------------------
@@ -169,7 +169,7 @@ def train(force: bool) -> None:
 
     model_paths = train_all(force=force)
     for name, p in model_paths.items():
-        click.echo(f"✓ {name} → {p}")
+        click.echo(f"[OK] {name} -> {p}")
 
 
 # --------------------------------------------------------------------------
@@ -183,7 +183,7 @@ def evaluate() -> None:
     from src.evaluate import evaluate_all
 
     metrics = evaluate_all()
-    click.echo(f"\n✓ Evaluation complete. {len(metrics)} classifier(s) evaluated.")
+    click.echo(f"\n[OK] Evaluation complete. {len(metrics)} classifier(s) evaluated.")
 
 
 # --------------------------------------------------------------------------
@@ -207,36 +207,36 @@ def run_all(force: bool, skip_postgres: bool) -> None:
 
     config.ensure_dirs()
 
-    click.echo("━━━ [1/7] Ingest (full) ━━━")
+    click.echo("=== [1/7] Ingest (full) ===")
     ingest_full(force=force)
 
-    click.echo("━━━ [2/7] Ingest (incremental) ━━━")
+    click.echo("=== [2/7] Ingest (incremental) ===")
     ingest_incremental(force=force)
 
-    click.echo("━━━ [3/7] Transform ━━━")
+    click.echo("=== [3/7] Transform ===")
     transform_raw_to_staging(force=force)
     transform_staging_to_curated(force=force)
 
-    click.echo("━━━ [4/7] Validate ━━━")
+    click.echo("=== [4/7] Validate ===")
     staging_df = pd.read_parquet(config.Paths.staging / "staging.parquet")
     run_all_checks(staging_df, write_report=True)
 
-    click.echo("━━━ [5/7] Storage ━━━")
+    click.echo("=== [5/7] Storage ===")
     export_all_formats()
     export_partitioned()
     if not skip_postgres:
         try:
             load_curated_to_postgres()
         except Exception as exc:
-            click.echo(f"⚠ PostgreSQL skipped: {exc}")
+            click.echo(f"[WARN] PostgreSQL skipped: {exc}")
 
-    click.echo("━━━ [6/7] Train ━━━")
+    click.echo("=== [6/7] Train ===")
     train_all(force=force)
 
-    click.echo("━━━ [7/7] Evaluate ━━━")
+    click.echo("=== [7/7] Evaluate ===")
     metrics = evaluate_all()
 
-    click.echo("\n✓ Pipeline complete.")
+    click.echo("\n[OK] Pipeline complete.")
 
 
 # --------------------------------------------------------------------------
@@ -251,9 +251,9 @@ def check_source() -> None:
 
     is_valid, checksum = verify_source()
     if is_valid:
-        click.echo(f"✓ Checksum valid: {checksum}")
+        click.echo(f"[OK] Checksum valid: {checksum}")
     else:
-        click.echo(f"✗ Checksum MISMATCH: {checksum}")
+        click.echo(f"[FAIL] Checksum MISMATCH: {checksum}")
         sys.exit(1)
 
 

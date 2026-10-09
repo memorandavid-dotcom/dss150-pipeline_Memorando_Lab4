@@ -1,0 +1,184 @@
+{
+  "run_at": "2026-10-09T14:53:13.457760+00:00",
+  "summary": {
+    "PASS": 29,
+    "WARN": 0,
+    "FAIL": 0
+  },
+  "checks": [
+    {
+      "check": "schema",
+      "status": "PASS",
+      "details": "All 16 required columns present.",
+      "value": null
+    },
+    {
+      "check": "completeness.word_count",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.character_count",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.sentence_count",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.lexical_diversity",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.avg_sentence_length",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.avg_word_length",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.punctuation_ratio",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.flesch_reading_ease",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.gunning_fog_index",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.grammar_errors",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.passive_voice_ratio",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.predictability_score",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.burstiness",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.sentiment_score",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.content_type",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "completeness.label",
+      "status": "PASS",
+      "details": "null_rate=0.00% (threshold=10%)",
+      "value": 0.0
+    },
+    {
+      "check": "uniqueness",
+      "status": "PASS",
+      "details": "0 duplicate rows found (keyed by _row_hash)",
+      "value": "0"
+    },
+    {
+      "check": "validity.lexical_diversity",
+      "status": "PASS",
+      "details": "0 values outside [0.0, 1.0]",
+      "value": "0"
+    },
+    {
+      "check": "validity.punctuation_ratio",
+      "status": "PASS",
+      "details": "0 values outside [0.0, 1.0]",
+      "value": "0"
+    },
+    {
+      "check": "validity.passive_voice_ratio",
+      "status": "PASS",
+      "details": "0 values outside [0.0, 1.0]",
+      "value": "0"
+    },
+    {
+      "check": "validity.sentiment_score",
+      "status": "PASS",
+      "details": "0 values outside [-1.0, 1.0]",
+      "value": "0"
+    },
+    {
+      "check": "validity.word_count",
+      "status": "PASS",
+      "details": "0 values outside [1, 100000]",
+      "value": "0"
+    },
+    {
+      "check": "validity.character_count",
+      "status": "PASS",
+      "details": "0 values outside [1, 1000000]",
+      "value": "0"
+    },
+    {
+      "check": "validity.sentence_count",
+      "status": "PASS",
+      "details": "0 values outside [0, 10000]",
+      "value": "0"
+    },
+    {
+      "check": "validity.label",
+      "status": "PASS",
+      "details": "0 values not in [0, 1]",
+      "value": "0"
+    },
+    {
+      "check": "freshness",
+      "status": "PASS",
+      "details": "Latest ingestion: 2026-10-09T14:53:13.176719+00:00 (0.0h ago)",
+      "value": 7.780166666666666e-05
+    },
+    {
+      "check": "class_balance",
+      "status": "PASS",
+      "details": "Class distribution: {np.int64(0): 684, np.int64(1): 683}  min/max ratio=0.999",
+      "value": 0.9985380116959064
+    },
+    {
+      "check": "row_count",
+      "status": "PASS",
+      "details": "1367 rows (minimum required: 1200)",
+      "value": 1367
+    }
+  ]
+}

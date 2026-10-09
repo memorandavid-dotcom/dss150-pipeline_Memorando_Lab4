@@ -1,0 +1,45 @@
+# ============================================================
+# metadata/source_manifest.yml
+# Cryptographic Identity & Provenance for Source Datasets
+# ============================================================
+
+manifest_version: "1.0.0"
+generated_at_utc: "2026-10-09T14:52:00Z"
+project: "DSS150P Lab 4 - AI vs Human Text Detection Pipeline"
+author: "David Hyzxent L. Memorando"
+student_number: "2024162312"
+section: "DSS150P_CM17_1Q2627"
+
+primary_source:
+  identifier: "ai_human_content_detection_v2_2025"
+  filename: "ai_human_content_detection_dataset.csv"
+  relative_path: "data/source/O_Files/ProjectData2(2025v)/ai_human_content_detection_dataset.csv"
+  format: "CSV"
+  encoding: "utf-8"
+  delimiter: ","
+  file_size_bytes: 1409940
+  row_count: 1367
+  column_count: 17
+  checksum_algorithm: "SHA-256"
+  sha256: "b63cbf71bf8921071fb4513a0d0616494040463e1d41c7c04ac46ccbb530be1f"
+  provenance:
+    origin: "Predictive Analytics Group Project (Term 1, AY 2024-2025)"
+    domain: "Stylometric and Lexical AI-Generated Content Detection"
+    license: "Educational / Research Use"
+    availability: "Local immutable source copy in data/source/"
+    confidentiality: "Public / Non-PII Synthetic & Curated Text Corpus"
+
+reference_source:
+  identifier: "ai_human_detection_v1_legacy"
+  filename: "ai_human_detection_v1.csv"
+  relative_path: "data/source/O_Files/ProjectData/ai_human_detection_v1.csv"
+  format: "CSV"
+  encoding: "utf-8"
+  delimiter: ","
+  file_size_bytes: 1620537
+  row_count: 686
+  column_count: 11
+  checksum_algorithm: "SHA-256"
+  sha256: "3023b587249a198267000b5b2c2443fe5833143aa79f236fb1f87c9fe402dc4f"
+  provenance:
+    origin: "Phase 1 Raw Text Corpus with 3-class target (ai, human, post_edited_ai)"

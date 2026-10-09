@@ -39,7 +39,7 @@ _RAW: dict[str, Any] = _load_yaml(_SETTINGS_PATH)
 
 
 # ---------------------------------------------------------------------------
-# Public accessors — all paths returned as absolute Path objects
+# Public accessors - all paths returned as absolute Path objects
 # ---------------------------------------------------------------------------
 
 

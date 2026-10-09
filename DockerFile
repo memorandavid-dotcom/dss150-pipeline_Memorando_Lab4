@@ -1,0 +1,38 @@
+# ============================================================
+# Dockerfile: DSS150P Lab 4 Pipeline Container
+# Base: Python 3.11 Slim for reproducible builds
+# ============================================================
+
+FROM python:3.11-slim
+
+# Set environment flags
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+WORKDIR /app
+
+# Install minimal OS dependencies for psycopg2 and compilation
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy and install pinned requirements
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy source code, configs, metadata, and sql
+COPY config/ /app/config/
+COPY metadata/ /app/metadata/
+COPY sql/ /app/sql/
+COPY src/ /app/src/
+COPY data/ /app/data/
+COPY pyproject.toml /app/
+COPY README.md /app/
+
+# Default entrypoint runs the full pipeline
+CMD ["python", "-m", "src.cli", "run-all", "--skip-postgres"]

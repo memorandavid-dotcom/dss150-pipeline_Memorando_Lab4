@@ -3,8 +3,8 @@ src/transform.py
 ================
 Deterministic, idempotent transformations across three layers:
 
-  raw      → staging  : type casting, null handling, dedup, quarantine
-  staging  → curated  : feature engineering, encoding, scaling, split manifest
+  raw      -> staging  : type casting, null handling, dedup, quarantine
+  staging  -> curated  : feature engineering, encoding, scaling, split manifest
 
 All functions are rerun-safe: they check for existing output and skip unless
 force=True. Transformation logic is kept outside the Airflow DAG.
@@ -45,7 +45,7 @@ def _latest_raw_file(pattern: str = "full__") -> Optional[Path]:
 
 
 # ---------------------------------------------------------------------------
-# RAW → STAGING
+# RAW -> STAGING
 # ---------------------------------------------------------------------------
 
 EXPECTED_TYPES: dict[str, str] = {
@@ -156,7 +156,7 @@ def transform_raw_to_staging(
         q_path.parent.mkdir(parents=True, exist_ok=True)
         quarantine_df["_quarantine_reason"] = "null_target"
         quarantine_df.to_parquet(q_path, index=False)
-        logger.warning("Quarantined %d rows → %s", len(quarantine_df), q_path.name)
+        logger.warning("Quarantined %d rows -> %s", len(quarantine_df), q_path.name)
 
     # --- Staging audit ---
     df["_staged_at_utc"] = _now_utc()
@@ -164,12 +164,12 @@ def transform_raw_to_staging(
 
     # Write
     df.to_parquet(staging_path, index=False, engine="pyarrow")
-    logger.info("Staging complete → %s  (%d rows)", staging_path.name, len(df))
+    logger.info("Staging complete -> %s  (%d rows)", staging_path.name, len(df))
     return staging_path
 
 
 # ---------------------------------------------------------------------------
-# STAGING → CURATED
+# STAGING -> CURATED
 # ---------------------------------------------------------------------------
 
 
@@ -183,7 +183,7 @@ def transform_staging_to_curated(
     Steps:
       1. Load staging Parquet
       2. Encode categorical features (LabelEncoder for content_type)
-      3. Scale numeric features (StandardScaler — fit on train, apply to test)
+      3. Scale numeric features (StandardScaler - fit on train, apply to test)
       4. Perform deterministic train/test split (fixed seed + split manifest)
       5. Write curated/train.parquet, curated/test.parquet, curated/full.parquet
       6. Save split_manifest.json
@@ -300,6 +300,6 @@ def transform_staging_to_curated(
     config.Paths.metadata.mkdir(parents=True, exist_ok=True)
     with open(manifest_path, "w", encoding="utf-8") as fh:
         json.dump(manifest, fh, indent=2)
-    logger.info("Split manifest saved → %s", manifest_path.name)
+    logger.info("Split manifest saved -> %s", manifest_path.name)
 
     return {"train": train_path, "test": test_path, "full": full_path}

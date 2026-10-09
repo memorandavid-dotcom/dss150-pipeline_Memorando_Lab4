@@ -1,0 +1,107 @@
+version: '3.8'
+
+# ============================================================
+# docker-compose.yml
+# DSS150P Lab 4 - Multi-Container Pipeline & Airflow Orchestration
+# ============================================================
+
+x-airflow-common:
+  &airflow-common
+  build:
+    context: .
+    dockerfile: DockerFile
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-dss150_user}:${POSTGRES_PASSWORD:-changeme_local_only}@postgres:5432/${POSTGRES_DB:-dss150_pipeline}
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY:-46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqJZmc=}
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__LOGGING_LEVEL: INFO
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY:-temporary_webserver_secret_key_12345}
+    PYTHONPATH: /app
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: 5432
+    POSTGRES_DB: ${POSTGRES_DB:-dss150_pipeline}
+    POSTGRES_USER: ${POSTGRES_USER:-dss150_user}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_local_only}
+  volumes:
+    - ./dags:/app/dags
+    - ./data:/app/data
+    - ./outputs:/app/outputs
+    - ./logs:/app/logs
+    - ./metadata:/app/metadata
+    - ./config:/app/config
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  # -------------------------------------------------------------------------
+  # 1. PostgreSQL Database Service
+  # -------------------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: dss150_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dss150_pipeline}
+      POSTGRES_USER: ${POSTGRES_USER:-dss150_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_local_only}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./sql/transformations.sql:/docker-entrypoint-initdb.d/02_transformations.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dss150_user} -d ${POSTGRES_DB:-dss150_pipeline}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # -------------------------------------------------------------------------
+  # 2. Standalone Pipeline Runner Service
+  # -------------------------------------------------------------------------
+  pipeline-runner:
+    build:
+      context: .
+      dockerfile: DockerFile
+    container_name: dss150_pipeline_runner
+    environment:
+      <<: *airflow-common-env
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+      - ./logs:/app/logs
+      - ./metadata:/app/metadata
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: python -m src.cli run-all
+
+  # -------------------------------------------------------------------------
+  # 3. Airflow Webserver (UI on port 8080)
+  # -------------------------------------------------------------------------
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: dss150_airflow_webserver
+    command: >
+      bash -c "airflow db migrate &&
+               airflow users create --username admin --firstname David --lastname Memorando --role Admin --email admin@example.com --password admin || true &&
+               airflow webserver"
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # -------------------------------------------------------------------------
+  # 4. Airflow Scheduler
+  # -------------------------------------------------------------------------
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: dss150_airflow_scheduler
+    command: airflow scheduler
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local

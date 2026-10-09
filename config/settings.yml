@@ -77,8 +77,8 @@ model:
         solver: "lbfgs"
     - name: "RandomForest"
       params:
-        n_estimators: 200
-        max_depth: 10
+        n_estimators: 150
+        max_depth: 8
         random_state: 42
         n_jobs: -1
     - name: "SVC"
@@ -87,20 +87,16 @@ model:
         kernel: "rbf"
         probability: true
         random_state: 42
-    - name: "XGBoost"
+    - name: "GradientBoosting"
       params:
-        n_estimators: 200
+        n_estimators: 100
+        learning_rate: 0.1
+        max_depth: 5
+        random_state: 42
+    - name: "DecisionTree"
+      params:
         max_depth: 6
-        learning_rate: 0.1
-        use_label_encoder: false
-        eval_metric: "logloss"
         random_state: 42
-    - name: "LightGBM"
-      params:
-        n_estimators: 200
-        learning_rate: 0.1
-        random_state: 42
-        verbose: -1
 
 # --- Data quality thresholds ---
 quality:

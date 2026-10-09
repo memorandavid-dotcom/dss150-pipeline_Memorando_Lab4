@@ -1,0 +1,23 @@
+{
+  "committed_batches": [
+    "batch_01_of_03",
+    "batch_02_of_03",
+    "batch_03_of_03"
+  ],
+  "last_full_run": {
+    "run_id": "6dc5b77b096c",
+    "snapshot": "full__6dc5b77b096c__ai_human_content_detection_dataset.parquet",
+    "rows": 1367,
+    "checksum": "b63cbf71bf8921071fb4513a0d0616494040463e1d41c7c04ac46ccbb530be1f",
+    "ingested_at": "2026-10-09T14:53:13.251544+00:00"
+  },
+  "last_incremental_run": {
+    "run_id": "6fa3237bf826",
+    "new_batches": [
+      "incremental__batch_01_of_03__6fa3237bf826.parquet",
+      "incremental__batch_02_of_03__6fa3237bf826.parquet",
+      "incremental__batch_03_of_03__6fa3237bf826.parquet"
+    ],
+    "ingested_at": "2026-10-09T14:53:13.328667+00:00"
+  }
+}

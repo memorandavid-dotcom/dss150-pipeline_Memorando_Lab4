@@ -1,0 +1,52 @@
+[
+  {
+    "check": "reproducibility.LogisticRegression",
+    "status": "PASS",
+    "details": "f1_weighted: expected=0.5584, actual=0.5584, diff=0.0000 (tol=0.02)",
+    "value": {
+      "expected": 0.5584,
+      "actual": 0.5583882783882784,
+      "diff": 1.172161172158237e-05
+    }
+  },
+  {
+    "check": "reproducibility.SVC",
+    "status": "PASS",
+    "details": "f1_weighted: expected=0.5547, actual=0.5547, diff=0.0000 (tol=0.02)",
+    "value": {
+      "expected": 0.5547,
+      "actual": 0.5547208013640239,
+      "diff": 2.080136402393684e-05
+    }
+  },
+  {
+    "check": "reproducibility.RandomForest",
+    "status": "PASS",
+    "details": "f1_weighted: expected=0.4800, actual=0.4800, diff=0.0000 (tol=0.02)",
+    "value": {
+      "expected": 0.48,
+      "actual": 0.4799786153434911,
+      "diff": 2.1384656508860456e-05
+    }
+  },
+  {
+    "check": "reproducibility.GradientBoosting",
+    "status": "PASS",
+    "details": "f1_weighted: expected=0.4731, actual=0.4731, diff=0.0000 (tol=0.02)",
+    "value": {
+      "expected": 0.4731,
+      "actual": 0.47307692307692306,
+      "diff": 2.3076923076958966e-05
+    }
+  },
+  {
+    "check": "reproducibility.DecisionTree",
+    "status": "PASS",
+    "details": "f1_weighted: expected=0.4653, actual=0.4653, diff=0.0000 (tol=0.02)",
+    "value": {
+      "expected": 0.4653,
+      "actual": 0.46534381355466387,
+      "diff": 4.3813554663874044e-05
+    }
+  }
+]

@@ -47,15 +47,28 @@ def _build_classifier(name: str, params: dict[str, Any]):
         return RandomForestClassifier(**params)
     elif name == "SVC":
         return SVC(**params)
+    elif name == "GradientBoosting":
+        from sklearn.ensemble import GradientBoostingClassifier
+        return GradientBoostingClassifier(**params)
+    elif name == "DecisionTree":
+        from sklearn.tree import DecisionTreeClassifier
+        return DecisionTreeClassifier(**params)
     elif name == "XGBoost":
-        from xgboost import XGBClassifier
-
-        params = {k: v for k, v in params.items() if k != "use_label_encoder"}
-        return XGBClassifier(**params)
+        try:
+            from xgboost import XGBClassifier
+            params = {k: v for k, v in params.items() if k != "use_label_encoder"}
+            return XGBClassifier(**params)
+        except ImportError:
+            logger.warning("XGBoost not installed; falling back to GradientBoostingClassifier")
+            from sklearn.ensemble import GradientBoostingClassifier
+            return GradientBoostingClassifier(random_state=params.get("random_state", 42))
     elif name == "LightGBM":
-        from lightgbm import LGBMClassifier
-
-        return LGBMClassifier(**params)
+        try:
+            from lightgbm import LGBMClassifier
+            return LGBMClassifier(**params)
+        except ImportError:
+            logger.warning("LightGBM not installed; falling back to RandomForestClassifier")
+            return RandomForestClassifier(random_state=params.get("random_state", 42))
     else:
         raise ValueError(f"Unknown classifier: {name}")
 
@@ -94,13 +107,13 @@ def train_all(
       2. Fit final model on full training set
       3. Serialize to outputs/model/<name>.pkl
 
-    Returns dict mapping classifier name → model path.
+    Returns dict mapping classifier name -> model path.
     """
     config.ensure_dirs()
     config.Paths.model_dir.mkdir(parents=True, exist_ok=True)
 
     X_train, y_train = _load_split("train")
-    logger.info("Training data: %d rows × %d features", len(X_train), X_train.shape[1])
+    logger.info("Training data: %d rows x %d features", len(X_train), X_train.shape[1])
 
     classifier_configs = config.Model.classifiers
     model_paths: dict[str, Path] = {}
@@ -145,7 +158,7 @@ def train_all(
         }
         cv_results_all[name] = cv_summary
         logger.info(
-            "%s CV: acc=%.4f±%.4f  f1=%.4f±%.4f",
+            "%s CV: acc=%.4f+/-%.4f  f1=%.4f+/-%.4f",
             name,
             cv_summary["accuracy"]["mean"],
             cv_summary["accuracy"]["std"],
@@ -156,7 +169,7 @@ def train_all(
         # Fit final model on full training set
         clf.fit(X_train, y_train)
         joblib.dump(clf, model_path)
-        logger.info("Model saved → %s", model_path.name)
+        logger.info("Model saved -> %s", model_path.name)
         model_paths[name] = model_path
 
     # Persist CV results
@@ -167,6 +180,6 @@ def train_all(
             fh,
             indent=2,
         )
-    logger.info("CV results saved → %s", cv_path.name)
+    logger.info("CV results saved -> %s", cv_path.name)
 
     return model_paths

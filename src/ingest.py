@@ -100,7 +100,7 @@ def verify_source(source_path: Optional[Path] = None) -> tuple[bool, str]:
             path.name,
         )
     else:
-        logger.info("Source checksum verified ✓  [%s]", actual[:16] + "…")
+        logger.info("Source checksum verified [OK] [%s...]", actual[:16])
     return is_valid, actual
 
 
@@ -160,7 +160,7 @@ def ingest_full(
 
     # Save as Parquet (columnar, efficient)
     df.to_parquet(snapshot_path, index=False, engine="pyarrow")
-    logger.info("Full ingestion complete → %s  (%d rows)", snapshot_path.name, len(df))
+    logger.info("Full ingestion complete -> %s  (%d rows)", snapshot_path.name, len(df))
 
     # Update checkpoint
     state = _load_checkpoint()
@@ -184,7 +184,7 @@ def ingest_full(
 def _make_batches(df: pd.DataFrame, n_batches: int) -> list[pd.DataFrame]:
     """
     Split a DataFrame into n deterministic, non-overlapping batches.
-    The split is based on row index (deterministic — same data → same batches).
+    The split is based on row index (deterministic - same data -> same batches).
     """
     size = len(df)
     batch_size = size // n_batches
@@ -253,7 +253,7 @@ def ingest_incremental(
         out_path = raw_dir / f"incremental__{batch_id}__{run_id}.parquet"
         batch_df.to_parquet(out_path, index=False, engine="pyarrow")
         logger.info(
-            "Batch %s ingested → %s  (%d rows)", batch_id, out_path.name, len(batch_df)
+            "Batch %s ingested -> %s  (%d rows)", batch_id, out_path.name, len(batch_df)
         )
 
         # Commit watermark

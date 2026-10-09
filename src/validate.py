@@ -4,13 +4,13 @@ src/validate.py
 Data quality, schema, and reproducibility checks.
 
 Check categories:
-  1. Schema validation   – required columns, declared types
-  2. Completeness        – null rate thresholds per column
-  3. Uniqueness          – row hash deduplication verification
-  4. Validity            – range/domain rules for numeric features and target
-  5. Freshness           – ingestion timestamp recency
-  6. Business rules      – target distribution, class balance
-  7. Reproducibility     – compare run metrics against baseline expected_metrics.json
+  1. Schema validation   - required columns, declared types
+  2. Completeness        - null rate thresholds per column
+  3. Uniqueness          - row hash deduplication verification
+  4. Validity            - range/domain rules for numeric features and target
+  5. Freshness           - ingestion timestamp recency
+  6. Business rules      - target distribution, class balance
+  7. Reproducibility     - compare run metrics against baseline expected_metrics.json
 
 Each check returns a dict with: check_name, status (PASS/WARN/FAIL), details.
 """
@@ -46,7 +46,7 @@ def _log_result(r: CheckResult) -> None:
     level = {"PASS": logging.INFO, "WARN": logging.WARNING, "FAIL": logging.ERROR}.get(
         r["status"], logging.INFO
     )
-    logger.log(level, "[%s] %s — %s", r["status"], r["check"], r["details"])
+    logger.log(level, "[%s] %s - %s", r["status"], r["check"], r["details"])
 
 
 # ---------------------------------------------------------------------------
@@ -344,6 +344,6 @@ def run_all_checks(
         report_path.parent.mkdir(parents=True, exist_ok=True)
         with open(report_path, "w", encoding="utf-8") as fh:
             json.dump(report, fh, indent=2, default=str)
-        logger.info("Quality report written → %s", report_path)
+        logger.info("Quality report written -> %s", report_path)
 
     return all_results

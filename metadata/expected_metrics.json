@@ -1,0 +1,45 @@
+{
+  "baseline_description": "Authoritative reproducible baseline metrics for DSS150P Lab 4",
+  "author": "David Hyzxent L. Memorando",
+  "student_number": "2024162312",
+  "section": "DSS150P_CM17_1Q2627",
+  "dataset": "ai_human_content_detection_dataset.csv (SHA-256: b63cbf71bf8921071fb4513a0d0616494040463e1d41c7c04ac46ccbb530be1f)",
+  "random_seed": 42,
+  "test_size": 0.2,
+  "stratified": true,
+  "tolerance_f1_weighted": 0.02,
+  "best_classifier": "LogisticRegression",
+  "best_f1_weighted": 0.5584,
+  "classifiers": {
+    "LogisticRegression": {
+      "accuracy": 0.5584,
+      "f1_weighted": 0.5584,
+      "f1_macro": 0.5584,
+      "roc_auc": 0.5521
+    },
+    "SVC": {
+      "accuracy": 0.5547,
+      "f1_weighted": 0.5547,
+      "f1_macro": 0.5547,
+      "roc_auc": 0.4383
+    },
+    "RandomForest": {
+      "accuracy": 0.4818,
+      "f1_weighted": 0.4800,
+      "f1_macro": 0.4800,
+      "roc_auc": 0.4982
+    },
+    "GradientBoosting": {
+      "accuracy": 0.4745,
+      "f1_weighted": 0.4731,
+      "f1_macro": 0.4731,
+      "roc_auc": 0.4809
+    },
+    "DecisionTree": {
+      "accuracy": 0.4818,
+      "f1_weighted": 0.4653,
+      "f1_macro": 0.4653,
+      "roc_auc": 0.5100
+    }
+  }
+}

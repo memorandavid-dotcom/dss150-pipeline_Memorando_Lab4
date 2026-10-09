@@ -1,0 +1,161 @@
+# ============================================================
+# metadata/data_contract.yml
+# Data Contract Specification for Ingestion & Staging
+# ============================================================
+
+contract_version: "1.0.0"
+dataset_id: "ai_human_content_detection_v2_2025"
+dataset_name: "AI vs Human Content Detection Stylometric Dataset"
+author: "David Hyzxent L. Memorando (2024162312)"
+section: "DSS150P_CM17_1Q2627"
+
+checksum:
+  algorithm: "SHA-256"
+  expected_hash: "b63cbf71bf8921071fb4513a0d0616494040463e1d41c7c04ac46ccbb530be1f"
+  on_mismatch: "fail"   # Pipeline execution halts immediately
+
+row_count_rules:
+  minimum_rows: 1200
+  expected_rows: 1367
+  on_violation: "fail"
+
+target_variable:
+  name: "label"
+  type: "integer"
+  allowed_values: [0, 1]
+  nullable: false
+  on_null: "quarantine"
+  on_invalid_value: "fail"
+
+uniqueness:
+  composite_key: ["_row_hash"]
+  allow_duplicates: false
+  deduplication_strategy: "keep_first"
+
+column_schema:
+  - name: "text_content"
+    type: "string"
+    nullable: false
+    role: "raw_text"
+    on_violation: "quarantine"
+
+  - name: "content_type"
+    type: "string"
+    nullable: false
+    role: "categorical_feature"
+    allowed_values:
+      - "Marketing"
+      - "Technical Blog"
+      - "Social Media"
+      - "News"
+      - "Email"
+      - "Education"
+    on_violation: "warn"
+
+  - name: "word_count"
+    type: "integer"
+    nullable: false
+    min_value: 1
+    max_value: 100000
+    on_violation: "warn"
+
+  - name: "character_count"
+    type: "integer"
+    nullable: false
+    min_value: 1
+    max_value: 1000000
+    on_violation: "warn"
+
+  - name: "sentence_count"
+    type: "integer"
+    nullable: false
+    min_value: 1
+    max_value: 10000
+    on_violation: "warn"
+
+  - name: "lexical_diversity"
+    type: "float"
+    nullable: false
+    min_value: 0.0
+    max_value: 1.0
+    on_violation: "warn"
+
+  - name: "avg_sentence_length"
+    type: "float"
+    nullable: false
+    min_value: 1.0
+    max_value: 500.0
+    on_violation: "warn"
+
+  - name: "avg_word_length"
+    type: "float"
+    nullable: false
+    min_value: 1.0
+    max_value: 50.0
+    on_violation: "warn"
+
+  - name: "punctuation_ratio"
+    type: "float"
+    nullable: false
+    min_value: 0.0
+    max_value: 1.0
+    on_violation: "warn"
+
+  - name: "flesch_reading_ease"
+    type: "float"
+    nullable: true
+    max_null_rate: 0.10
+    on_null: "impute_median"
+    on_violation: "warn"
+
+  - name: "gunning_fog_index"
+    type: "float"
+    nullable: true
+    max_null_rate: 0.10
+    on_null: "impute_median"
+    on_violation: "warn"
+
+  - name: "grammar_errors"
+    type: "integer"
+    nullable: false
+    min_value: 0
+    max_value: 1000
+    on_violation: "warn"
+
+  - name: "passive_voice_ratio"
+    type: "float"
+    nullable: true
+    max_null_rate: 0.10
+    on_null: "impute_median"
+    on_violation: "warn"
+
+  - name: "predictability_score"
+    type: "float"
+    nullable: false
+    min_value: 0.0
+    max_value: 1.0
+    on_violation: "warn"
+
+  - name: "burstiness"
+    type: "float"
+    nullable: false
+    min_value: 0.0
+    max_value: 1.0
+    on_violation: "warn"
+
+  - name: "sentiment_score"
+    type: "float"
+    nullable: true
+    max_null_rate: 0.10
+    min_value: -1.0
+    max_value: 1.0
+    on_null: "impute_median"
+    on_violation: "warn"
+
+audit_requirements:
+  mandatory_columns:
+    - "_pipeline_run_id"
+    - "_ingested_at_utc"
+    - "_source_file"
+    - "_source_checksum"
+    - "_row_hash"

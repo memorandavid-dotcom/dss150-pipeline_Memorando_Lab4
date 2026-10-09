@@ -38,7 +38,7 @@ def export_csv(df: pd.DataFrame, name: str, out_dir: Optional[Path] = None) -> P
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{name}.csv"
     df.to_csv(out_path, index=False)
-    logger.info("CSV written → %s  (%d rows)", out_path.name, len(df))
+    logger.info("CSV written -> %s  (%d rows)", out_path.name, len(df))
     return out_path
 
 
@@ -48,7 +48,7 @@ def export_jsonl(df: pd.DataFrame, name: str, out_dir: Optional[Path] = None) ->
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{name}.jsonl"
     df.to_json(out_path, orient="records", lines=True, default_handler=str)
-    logger.info("JSONL written → %s  (%d rows)", out_path.name, len(df))
+    logger.info("JSONL written -> %s  (%d rows)", out_path.name, len(df))
     return out_path
 
 
@@ -58,7 +58,7 @@ def export_parquet(df: pd.DataFrame, name: str, out_dir: Optional[Path] = None) 
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{name}.parquet"
     df.to_parquet(out_path, index=False, engine="pyarrow")
-    logger.info("Parquet written → %s  (%d rows)", out_path.name, len(df))
+    logger.info("Parquet written -> %s  (%d rows)", out_path.name, len(df))
     return out_path
 
 
@@ -116,7 +116,7 @@ def export_partitioned(source_parquet: Optional[Path] = None) -> Path:
         partition_cols=["content_type"],
         existing_data_behavior="overwrite_or_ignore",
     )
-    logger.info("Partitioned Parquet written → %s", part_dir)
+    logger.info("Partitioned Parquet written -> %s", part_dir)
     return part_dir
 
 
@@ -161,7 +161,7 @@ def load_to_postgres(
         chunksize=500,
     )
     logger.info(
-        "Loaded %d rows → PostgreSQL %s.%s  (if_exists=%s)",
+        "Loaded %d rows -> PostgreSQL %s.%s  (if_exists=%s)",
         len(df),
         schema,
         table_name,
@@ -180,7 +180,7 @@ def load_curated_to_postgres() -> None:
     ]:
         path = curated_dir / fname
         if not path.exists():
-            logger.warning("Curated file not found: %s — skipping.", fname)
+            logger.warning("Curated file not found: %s - skipping.", fname)
             continue
         df = pd.read_parquet(path, engine="pyarrow")
         load_to_postgres(df, table_name=table)
