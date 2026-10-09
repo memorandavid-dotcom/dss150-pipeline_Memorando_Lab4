@@ -1,0 +1,116 @@
+# ============================================================
+# Pipeline Configuration
+# All runtime settings. Secrets go in .env, never here.
+# ============================================================
+
+project:
+  name: "dss150-pipeline-memorando"
+  version: "1.0.0"
+  author: "David Hyzxent L. Memorando"
+  student_number: "2024162312"
+  section: "DSS150P_CM17_1Q2627"
+
+# --- Dataset identity ---
+source:
+  # Primary dataset (V2 – 2025 version with pre-computed stylometric features)
+  primary_file: "data/source/O_Files/ProjectData2(2025v)/ai_human_content_detection_dataset.csv"
+  primary_sha256: "b63cbf71bf8921071fb4513a0d0616494040463e1d41c7c04ac46ccbb530be1f"
+  primary_rows: 1367
+  primary_cols: 17
+
+  # Reference dataset (V1 – raw text version)
+  reference_file: "data/source/O_Files/ProjectData/ai_human_detection_v1.csv"
+  reference_sha256: "3023b587249a198267000b5b2c2443fe5833143aa79f236fb1f87c9fe402dc4f"
+
+  # Incremental batching simulation
+  n_batches: 3
+  checkpoint_file: "data/raw/.checkpoint.json"
+
+# --- Data layers ---
+paths:
+  raw_dir: "data/raw"
+  staging_dir: "data/staging"
+  curated_dir: "data/curated"
+  partitioned_dir: "data/partitioned"
+  quarantine_dir: "data/quarantine"
+  outputs_dir: "outputs"
+  model_dir: "outputs/model"
+  logs_dir: "logs"
+  metadata_dir: "metadata"
+
+# --- Schema / column definitions ---
+schema:
+  target_column: "label"
+  text_column: "text_content"
+  content_type_column: "content_type"
+  numeric_features:
+    - word_count
+    - character_count
+    - sentence_count
+    - lexical_diversity
+    - avg_sentence_length
+    - avg_word_length
+    - punctuation_ratio
+    - flesch_reading_ease
+    - gunning_fog_index
+    - grammar_errors
+    - passive_voice_ratio
+    - predictability_score
+    - burstiness
+    - sentiment_score
+  categorical_features:
+    - content_type
+  drop_columns:
+    - text_content       # Text itself not used as direct model input
+
+# --- Model / training ---
+model:
+  random_seed: 42
+  test_size: 0.20
+  cv_folds: 5
+  classifiers:
+    - name: "LogisticRegression"
+      params:
+        C: 1.0
+        max_iter: 1000
+        random_state: 42
+        solver: "lbfgs"
+    - name: "RandomForest"
+      params:
+        n_estimators: 200
+        max_depth: 10
+        random_state: 42
+        n_jobs: -1
+    - name: "SVC"
+      params:
+        C: 1.0
+        kernel: "rbf"
+        probability: true
+        random_state: 42
+    - name: "XGBoost"
+      params:
+        n_estimators: 200
+        max_depth: 6
+        learning_rate: 0.1
+        use_label_encoder: false
+        eval_metric: "logloss"
+        random_state: 42
+    - name: "LightGBM"
+      params:
+        n_estimators: 200
+        learning_rate: 0.1
+        random_state: 42
+        verbose: -1
+
+# --- Data quality thresholds ---
+quality:
+  max_null_rate: 0.10        # Flag column if > 10% null
+  min_rows_after_staging: 1200
+  target_classes: [0, 1]
+  uniqueness_key_columns: []  # No natural PK; use row hash
+
+# --- Reproducibility tolerance ---
+reproducibility:
+  metric: "f1_weighted"
+  tolerance: 0.02            # ± 2% of baseline F1
+  baseline_metrics_file: "metadata/expected_metrics.json"

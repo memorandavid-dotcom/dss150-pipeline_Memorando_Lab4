@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=71.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "dss150-pipeline-memorando"
+version = "1.0.0"
+description = "DSS150P Lab 4 – Reproducible Data Engineering Pipeline: AI vs Human Text Detection"
+authors = [{ name = "David Hyzxent L. Memorando", email = "2024162312@students.nu.edu.ph" }]
+license = { text = "MIT" }
+requires-python = ">=3.10"
+readme = "README.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+python_files = ["test_*.py"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
